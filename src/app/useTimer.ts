@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudio } from "./useAudio";
 
 export const useTimer = () => {
-    const { playEndSound, playStartSound, playLastTenSecondsSound } = useAudio();
+    const { playEndSound, playStartSound, playLastTenSecondsSound, isSoundActive, toggleSound } = useAudio();
 
     const refInterval = useRef<NodeJS.Timeout | undefined>();
     const [seconds, setSeconds] = useState(0);
@@ -87,6 +87,10 @@ export const useTimer = () => {
         setIsSetupOpen(true);
     }
 
+    function closeSetup() {
+        setIsSetupOpen(false);
+    }
+
     useEffect(() => {
         if (!isRunning) {
             return;
@@ -104,6 +108,20 @@ export const useTimer = () => {
         }
     }, [isRunning, seconds, minutes, discount]);
 
+    useEffect(() => {
+        // handle to close setup on pressing escape
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                closeSetup();
+            }
+        };
+
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [closeSetup]);
+
     return {
         seconds,
         minutes,
@@ -115,11 +133,14 @@ export const useTimer = () => {
         stopWatch,
         pauseOrStarWatch,
         openSetup,
+        closeSetup,
         maxRounds,
         warmupTime,
         minutesPerRound,
         setMinutesPerRound,
         setWarmupTime,
         setMaxRounds,
+        isSoundActive,
+        toggleSound,
     }
 };
