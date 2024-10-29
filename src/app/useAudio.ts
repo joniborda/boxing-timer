@@ -2,8 +2,8 @@ import { useState } from "react";
 
 export const useAudio = () => {
     const urlSoundEnd = "/gong.ogg";
-    const urlSoundStart = "/gong.ogg";
-    const urlSoundLastTenSeconds = "/gong.ogg";
+    const urlSoundStart = "/star-bell.mp3";
+    // const urlSoundLastTenSeconds = "/gong.ogg";
 
     const [isSoundActive, setIsSoundActive] = useState(true);
 
@@ -20,7 +20,7 @@ export const useAudio = () => {
     }
 
     function playLastTenSecondsSound() {
-        playSound(urlSoundLastTenSeconds);
+        //playSound(urlSoundLastTenSeconds);
     }
 
     function playEndSound() {
