@@ -5,21 +5,36 @@ export const useTimer = () => {
     const { playEndSound, playStartSound, playLastTenSecondsSound, isSoundActive, toggleSound } = useAudio();
 
     const refInterval = useRef<NodeJS.Timeout | undefined>();
-    const [seconds, setSeconds] = useState(0);
-    const [minutesPerRound, setMinutesPerRound] = useState(2);
-    const [minutes, setMinutes] = useState(minutesPerRound);
     const [rounds, setRounds] = useState(1);
+    const [minutesPerRound, setMinutesPerRound] = useState(2);
+    const [prepareMinutes, setPrepareMinutes] = useState(0);
+    const [prepareSeconds, setPrepareSeconds] = useState(30);
+    const [breakMinutes, setBreakMinutes] = useState(1);
+    const [breakSeconds, setBreakSeconds] = useState(0);
+    const [secondsPerRound, setSecondsPerRound] = useState(0);
+    const [minutes, setMinutes] = useState(prepareMinutes + (minutesPerRound * rounds) + (1 * rounds));
+    const [seconds, setSeconds] = useState(0);
     const [maxRounds, setMaxRounds] = useState(3);
     const [isRunning, setIsRunning] = useState(false);
+    const [isStopped, setIsStopped] = useState(true);
     const [isBreakTime, setIsBreakTime] = useState(false);
+    const [isPrepareTime, setIsPrepareTime] = useState(false);
     const [isLastTenSeconds, setIsLastTenSeconds] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
-    const [warmupTime, setWarmupTime] = useState(0);
 
     const startWatch = useCallback(() => {
         setIsRunning(true);
-        playStartSound();
+        setIsPrepareTime(true);
+        setIsBreakTime(false);
+        setIsStopped(false);
+        setMinutes(prepareMinutes);
+        setSeconds(prepareSeconds);
+
     }, [setIsRunning, playStartSound]);
+
+    const resumeWatch = useCallback(() => {
+        setIsRunning(true);
+    }, [setIsRunning]);
 
     const stopWatch = useCallback(() => {
         setIsRunning(false);
@@ -30,6 +45,7 @@ export const useTimer = () => {
         setSeconds(0);
         setMinutes(minutesPerRound);
         setRounds(1);
+        setIsStopped(true);
     }, [minutesPerRound, refInterval]);
 
     const pauseWatch = useCallback(() => {
@@ -44,8 +60,12 @@ export const useTimer = () => {
             pauseWatch();
             return;
         }
+        if (isStopped) {
+            startWatch();
+            return;
+        }
 
-        startWatch();
+        resumeWatch();
     }, [isRunning, startWatch, pauseWatch]);
 
     const discount = useCallback(() => {
@@ -55,26 +75,36 @@ export const useTimer = () => {
             newMinutes -= 1;
             newSeconds = 59;
         }
-
-        if (newMinutes === 0 && newSeconds <= 10 && !isBreakTime && !isLastTenSeconds) {
+        
+        if (newMinutes === 0 && newSeconds <= 10 && !isBreakTime && !isLastTenSeconds && !isPrepareTime) {
             setIsLastTenSeconds(true);
             playLastTenSecondsSound();
         }
         if (newMinutes < 0) {
             newSeconds = 0;
             setIsLastTenSeconds(false);
+            if (isPrepareTime) {
+                setIsPrepareTime(false);
+                setRounds(1);
+                setMinutes(minutesPerRound);
+                setSeconds(secondsPerRound);
+                playStartSound();
+                return;
+            }
             if (isBreakTime) {
                 newMinutes = minutesPerRound;
+                newSeconds = secondsPerRound;
                 setIsBreakTime(false);
                 setRounds(rounds + 1);
                 playStartSound();
             } else {
-                playEndSound();
                 if (rounds === maxRounds) {
                     stopWatch();
                 }
-                newMinutes = 1;
+                newMinutes = breakMinutes;
+                newSeconds = breakSeconds;
                 setIsBreakTime(true);
+                playEndSound();
             }
 
         }
@@ -101,7 +131,7 @@ export const useTimer = () => {
         }
         refInterval.current = setTimeout(() => {
             discount();
-        }, 150);
+        }, 1000);
         return () => {
             if (refInterval.current) {
                 clearTimeout(refInterval.current);
@@ -140,12 +170,19 @@ export const useTimer = () => {
         openSetup,
         closeSetup,
         maxRounds,
-        warmupTime,
+        prepareMinutes,
         minutesPerRound,
         setMinutesPerRound,
-        setWarmupTime,
+        setPrepareMinutes,
+        setPrepareSeconds,
+        setBreakMinutes,
+        setBreakSeconds,
         setMaxRounds,
         isSoundActive,
         toggleSound,
+        isPrepareTime,
+        prepareSeconds,
+        secondsPerRound,
+        setSecondsPerRound,
     }
 };
