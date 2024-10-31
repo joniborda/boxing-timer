@@ -89,6 +89,7 @@ export const useTimer = () => {
 
     function closeSetup() {
         setIsSetupOpen(false);
+        stopWatch();
     }
 
     useEffect(() => {
@@ -112,6 +113,10 @@ export const useTimer = () => {
         // handle to close setup on pressing escape
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
+                closeSetup();
+            }
+
+            if (event.key === "Enter") {
                 closeSetup();
             }
         };

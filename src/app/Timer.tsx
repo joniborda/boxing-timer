@@ -25,6 +25,9 @@ function Timer() {
         warmupTime,
         minutesPerRound,
         maxRounds,
+        setMaxRounds,
+        setWarmupTime,
+        setMinutesPerRound,
         isSoundActive,
         toggleSound,
     } = useTimer();
@@ -33,44 +36,58 @@ function Timer() {
     return (
         <main>
             <section className="flex flex-col justify-center items-center gap-4 p-4">
-                <div className="text-2xl md:text-5xl lg:text-[8rem] font-mono">
+                <div className="text-2xl md:text-5xl lg:text-[8rem] font-bold">
                     <div>
                         {clockHours < 10 ? "0" + clockHours : clockHours}:{clockMinutes < 10 ? "0" + clockMinutes : clockMinutes}
-                        {isPM ? "PM" : "AM"}
+                        <span className="text-base md:text-3xl">
+                            {isPM ? "PM" : "AM"}
+                        </span>
                     </div>
                 </div>
-                <div className="w-full m-auto">
-                    <div className="text-base md:text-xl lg:text-[2rem] font-mono bg-white text-black inline-block rounded-xl rounded-br-none rounded-bl-none p-2 md:p-4">
-                        Round {rounds}
-                        <button onClick={() => toggleSound()}>
-                            {isSoundActive ? "🔔" : "🔕"}
-                        </button>
+
+                <div className="w-full m-auto flex flex-row justify-center gap-4">
+                    <div className="bg-white rounded-xl p-2 md:p-4 text-center">
+                        <span className="text-center text-[#ea1e0d] text-2xl font-bold">ROUNDS</span>
+                        <div className="text-[20rem] text-black font-bold"
+                            style={{
+                                lineHeight: "1",
+                                letterSpacing: "-.04em",
+                            }}>
+                            {rounds < 10 ? "0" + rounds : rounds}
+                        </div>
                     </div>
                     <div
-                        className={`overflow-hidden text-center text-[31vw] md:text-[33vw] font-mono rounded-3xl rounded-tl-none ${isBreakTime ? "bg-red-500" : isLastTenSeconds ? "bg-yellow-500" : "bg-green-700"}`}
+                        className={`overflow-hidden text-center font-bold text-[10vw] md:text-[20rem] p-4 rounded-3xl ${isBreakTime ? "bg-[#ea1e0d]" : isLastTenSeconds ? "bg-[#e2dc07]" : "bg-[#106e0c]"}`}
                         style={{
                             lineHeight: "1",
                             letterSpacing: "-.04em",
                         }}>
                         {minutes < 10 ? "0" + minutes : minutes}:{seconds < 10 ? "0" + seconds : seconds}
                     </div>
-                    <div className="flex flex-row justify-center">
+                </div>
+                <div>
+                    <div className="flex flex-row justify-center gap-4">
                         <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl"
+                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
                             onClick={() => {
                                 pauseOrStarWatch();
                             }}>
                             {isRunning ? "Pause" : "Start"}
                         </button>
                         <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl"
+                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
                             onClick={() => { stopWatch() }}>
                             Stop
                         </button>
                         <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl"
+                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
                             onClick={() => { openSetup() }}>
                             Setup
+                        </button>
+                        <button
+                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
+                            onClick={() => toggleSound()}>
+                            {isSoundActive ? "Sound On" : "Sound Off"}
                         </button>
                     </div>
                 </div>
@@ -90,7 +107,7 @@ function Timer() {
                             name="rounds_input"
                             type="number"
                             value={maxRounds}
-                            onChange={() => { }}
+                            onChange={(e) => { setMaxRounds(parseInt(e.target.value)) }}
                         />
                     </div>
                     <div className="flex flex-col justify-center items-center">
@@ -101,7 +118,7 @@ function Timer() {
                             name="time_per_round_input"
                             type="number"
                             value={minutesPerRound}
-                            onChange={() => { }}
+                            onChange={(e) => { setMinutesPerRound(parseInt(e.target.value)) }}
                         />
                     </div>
                     <div className="flex flex-col justify-center items-center">
@@ -112,7 +129,7 @@ function Timer() {
                             name="warmup_input"
                             type="number"
                             value={warmupTime}
-                            onChange={() => { }}
+                            onChange={(e) => { setWarmupTime(parseInt(e.target.value)) }}
                         />
                     </div>
                 </div>
