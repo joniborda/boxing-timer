@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudio } from "./useAudio";
 
+const warningMinutes = 0;
+const warningSeconds = 10;
+
 export const useTimer = () => {
     const { playEndSound, playStartSound, playLastTenSecondsSound, isSoundActive, toggleSound } = useAudio();
 
@@ -184,5 +187,9 @@ export const useTimer = () => {
         prepareSeconds,
         secondsPerRound,
         setSecondsPerRound,
+        breakMinutes,
+        breakSeconds,
+        warningMinutes,
+        warningSeconds,
     }
 };

@@ -35,6 +35,10 @@ function Timer() {
         prepareSeconds,
         secondsPerRound,
         setSecondsPerRound,
+        warningMinutes,
+        warningSeconds,
+        breakMinutes,
+        breakSeconds,
     } = useTimer();
 
 
@@ -68,6 +72,40 @@ function Timer() {
                             letterSpacing: "-.04em",
                         }}>
                         {minutes < 10 ? "0" + minutes : minutes}:{seconds < 10 ? "0" + seconds : seconds}
+                    </div>
+                </div>
+                <div className="flex flex-row gap-4">
+                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                        <div className="text-[#e2dc07] text-4xl font-bold">
+                            {prepareMinutes < 10 ? "0" + prepareMinutes : prepareMinutes}:{prepareSeconds < 10 ? "0" + prepareSeconds : prepareSeconds}
+                        </div>
+                        <div className="text-sm text-[#868688]">
+                            PREPARE
+                        </div>
+                    </div>
+                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                        <div className="text-[#106e0c] text-4xl font-bold">
+                            {minutesPerRound < 10 ? "0" + minutesPerRound : minutesPerRound}:{secondsPerRound < 10 ? "0" + secondsPerRound : secondsPerRound}
+                        </div>
+                        <div className="text-sm text-[#868688]">
+                            ROUND
+                        </div>
+                    </div>
+                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                        <div className="text-[#ff6707] text-4xl font-bold">
+                            {warningMinutes < 10 ? "0" + warningMinutes : warningMinutes}:{warningSeconds < 10 ? "0" + warningSeconds : warningSeconds}
+                        </div>
+                        <div className="text-sm text-[#868688]">
+                            WARNING
+                        </div>
+                    </div>
+                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                        <div className="text-[#ea1e0d] text-4xl font-bold">
+                            {breakMinutes < 10 ? "0" + breakMinutes : breakMinutes}:{breakSeconds < 10 ? "0" + breakSeconds : breakSeconds}
+                        </div>
+                        <div className="text-sm text-[#868688]">
+                            REST
+                        </div>
                     </div>
                 </div>
                 <div>
