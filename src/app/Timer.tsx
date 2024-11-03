@@ -47,7 +47,7 @@ function Timer() {
 
     return (
         <main>
-            <section className="flex flex-col justify-center items-center gap-4 p-4">
+            <section className="flex flex-col justify-center items-center gap-4 p-4 md:p-12 lg:p-12 max-w-96 md:max-w-7xl m-auto">
                 <div className="text-2xl md:text-5xl lg:text-[8rem] font-bold">
                     <div>
                         {clockHours < 10 ? "0" + clockHours : clockHours}:{clockMinutes < 10 ? "0" + clockMinutes : clockMinutes}
@@ -58,9 +58,9 @@ function Timer() {
                 </div>
 
                 <div className="w-full m-auto flex flex-row justify-center gap-4">
-                    <div className="bg-white rounded-xl p-2 md:p-4 text-center">
-                        <span className="text-center text-[#ea1e0d] text-2xl font-bold">ROUNDS</span>
-                        <div className="text-[20rem] text-black font-bold"
+                    <div className="bg-white rounded-xl p-2 md:p-4 text-center w-[40%]">
+                        <span className="text-center text-[#ea1e0d] text-xs md:text-sm lg:text-2xl font-bold">ROUNDS</span>
+                        <div className="text-[20vw] sm:text-[16vw] md:text-[20vw] lg:text-[14rem] xl:text-[18rem] 2xl:text-[20rem] text-black font-bold"
                             style={{
                                 lineHeight: "1",
                                 letterSpacing: "-.04em",
@@ -69,7 +69,7 @@ function Timer() {
                         </div>
                     </div>
                     <div
-                        className={`text-center p-4 rounded-3xl ${SessionTime.breakTime === sessionTime || SessionTime.idle === sessionTime ?
+                        className={`w-full text-center p-4 rounded-xl lg:rounded-3xl ${SessionTime.breakTime === sessionTime || SessionTime.idle === sessionTime ?
                             "bg-[#ea1e0d]" :
                             SessionTime.prepareTime === sessionTime ?
                                 "bg-[#e2dc07]" :
@@ -80,46 +80,51 @@ function Timer() {
                             lineHeight: "1",
                             letterSpacing: "-.04em",
                         }}>
-                        {SessionTime.idle === sessionTime &&
-                            <span className="text-center text-white text-2xl font-bold">TOTAL TIME</span>
-                        }
-                        <div className="overflow-hidden text-center font-bold text-[10vw] md:text-[20rem]">
+                        <span className="text-center text-white text-xs md:text-sm lg:text-2xl font-bold">
+                            {SessionTime.idle === sessionTime ? "TOTAL TIME" : "SESSION TIME"}
+                        </span>
+
+                        <div className="overflow-hidden text-center font-bold text-[20vw] sm:text-[16vw] md:text-[20vw] lg:text-[14rem] xl:text-[18rem] 2xl:text-[20rem]">
                             {minutes < 10 ? "0" + minutes : minutes}:{seconds < 10 ? "0" + seconds : seconds}
                         </div>
                     </div>
                 </div>
                 {sessionTime === SessionTime.idle ?
-                    <div className="flex flex-row gap-4">
-                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                            <div className="text-[#e2dc07] text-4xl font-bold">
-                                {prepareMinutes < 10 ? "0" + prepareMinutes : prepareMinutes}:{prepareSeconds < 10 ? "0" + prepareSeconds : prepareSeconds}
+                    <div className="flex flex-row gap-4 flex-wrap items-center justify-center">
+                        <div className="flex flex-row gap-4 flex-wrap items-center">
+                            <div className="flex flex-col justify-center items-center rounded-xl lg:rounded-3xl p-4 bg-[#202022]">
+                                <div className="text-[#e2dc07] text-sm md:text-xl lg:text-4xl font-bold">
+                                    {prepareMinutes < 10 ? "0" + prepareMinutes : prepareMinutes}:{prepareSeconds < 10 ? "0" + prepareSeconds : prepareSeconds}
+                                </div>
+                                <div className="text-[8px] md:text-xs lg:text-sm text-[#868688]">
+                                    PREPARE
+                                </div>
                             </div>
-                            <div className="text-sm text-[#868688]">
-                                PREPARE
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                            <div className="text-[#106e0c] text-4xl font-bold">
-                                {minutesPerRound < 10 ? "0" + minutesPerRound : minutesPerRound}:{secondsPerRound < 10 ? "0" + secondsPerRound : secondsPerRound}
-                            </div>
-                            <div className="text-sm text-[#868688]">
-                                ROUND
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                            <div className="text-[#ff6707] text-4xl font-bold">
-                                {warningMinutes < 10 ? "0" + warningMinutes : warningMinutes}:{warningSeconds < 10 ? "0" + warningSeconds : warningSeconds}
-                            </div>
-                            <div className="text-sm text-[#868688]">
-                                WARNING
+                            <div className="flex flex-col justify-center items-center rounded-xl lg:rounded-3xl p-4 bg-[#202022]">
+                                <div className="text-[#106e0c] text-sm md:text-xl lg:text-4xl font-bold">
+                                    {minutesPerRound < 10 ? "0" + minutesPerRound : minutesPerRound}:{secondsPerRound < 10 ? "0" + secondsPerRound : secondsPerRound}
+                                </div>
+                                <div className="text-[8px] md:text-xs lg:text-sm text-[#868688]">
+                                    ROUND
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                            <div className="text-[#ea1e0d] text-4xl font-bold">
-                                {breakMinutes < 10 ? "0" + breakMinutes : breakMinutes}:{breakSeconds < 10 ? "0" + breakSeconds : breakSeconds}
+                        <div className="flex flex-row gap-4 flex-wrap items-center">
+                            <div className="flex flex-col justify-center items-center rounded-xl lg:rounded-3xl p-4 bg-[#202022]">
+                                <div className="text-[#ff6707] text-sm md:text-xl lg:text-4xl font-bold">
+                                    {warningMinutes < 10 ? "0" + warningMinutes : warningMinutes}:{warningSeconds < 10 ? "0" + warningSeconds : warningSeconds}
+                                </div>
+                                <div className="text-[8px] md:text-xs lg:text-sm text-[#868688]">
+                                    WARNING
+                                </div>
                             </div>
-                            <div className="text-sm text-[#868688]">
-                                REST
+                            <div className="flex flex-col justify-center items-center rounded-xl lg:rounded-3xl p-4 bg-[#202022]">
+                                <div className="text-[#ea1e0d] text-sm md:text-xl lg:text-4xl font-bold">
+                                    {breakMinutes < 10 ? "0" + breakMinutes : breakMinutes}:{breakSeconds < 10 ? "0" + breakSeconds : breakSeconds}
+                                </div>
+                                <div className="text-[8px] md:text-xs lg:text-sm text-[#868688]">
+                                    REST
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -140,29 +145,33 @@ function Timer() {
                     </div>
                 }
                 <div>
-                    <div className="flex flex-row justify-center gap-4">
-                        <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
-                            onClick={() => {
-                                pauseOrStarWatch();
-                            }}>
-                            {status === State.running ? "Pause" : "Start"}
-                        </button>
-                        <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
-                            onClick={() => { stopWatch() }}>
-                            Stop
-                        </button>
-                        <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
-                            onClick={() => { openSetup() }}>
-                            Setup
-                        </button>
-                        <button
-                            className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
-                            onClick={() => toggleSound()}>
-                            {isSoundActive ? "Sound On" : "Sound Off"}
-                        </button>
+                    <div className="flex flex-row justify-center gap-4 flex-wrap">
+                        <div className="flex flex-row justify-center gap-4 flex-wrap">
+                            <button
+                                className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-sm sm:text-base md:text-2xl rounded-lg"
+                                onClick={() => {
+                                    pauseOrStarWatch();
+                                }}>
+                                {status === State.running ? "Pause" : "Start"}
+                            </button>
+                            <button
+                                className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-sm sm:text-base md:text-2xl rounded-lg"
+                                onClick={() => { stopWatch() }}>
+                                Stop
+                            </button>
+                        </div>
+                        <div className="flex flex-row justify-center gap-4 flex-wrap">
+                            <button
+                                className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-sm sm:text-base md:text-2xl rounded-lg"
+                                onClick={() => { openSetup() }}>
+                                Setup
+                            </button>
+                            <button
+                                className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-sm sm:text-base md:text-2xl rounded-lg"
+                                onClick={() => toggleSound()}>
+                                {isSoundActive ? "Sound On" : "Sound Off"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
