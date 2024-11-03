@@ -8,13 +8,13 @@ export const useTimer = () => {
 
 
     const refInterval = useRef<NodeJS.Timeout | undefined>();
-    const [minutesPerRound, setMinutesPerRound] = useState(2);
+    const [minutesPerRound, setMinutesPerRound] = useState(3);
     const [prepareMinutes, setPrepareMinutes] = useState(0);
     const [prepareSeconds, setPrepareSeconds] = useState(30);
     const [breakMinutes, setBreakMinutes] = useState(1);
     const [breakSeconds, setBreakSeconds] = useState(0);
     const [secondsPerRound, setSecondsPerRound] = useState(0);
-    const [maxRounds, setMaxRounds] = useState(3);
+    const [maxRounds, setMaxRounds] = useState(12);
     const [rounds, setRounds] = useState(maxRounds);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [elapsedMinutes, setElapsedMinutes] = useState(0);
