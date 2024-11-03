@@ -150,7 +150,7 @@ export const useTimer = () => {
         }
         refInterval.current = setTimeout(() => {
             discount();
-        }, 50);
+        }, 1000);
         return () => {
             if (refInterval.current) {
                 clearTimeout(refInterval.current);
