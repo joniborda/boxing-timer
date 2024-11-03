@@ -178,7 +178,7 @@ function Timer() {
             <section className={`backdrop fixed top-0 left-0 w-full h-full bg-black bg-opacity-50  ${isSetupOpen ? "" : "hidden"}`}>
                 <div className="bg-black w-full h-full flex flex-col lg:flex-row justify-center items-center gap-4">
                     <button
-                        className="py-4 px-6 bg-white text-black text-2xl absolute top-0 right-0"
+                        className="py-4 px-6 text-white text-2xl absolute top-0 right-0"
                         onClick={() => { closeSetup(); }}
                     >
                         X
