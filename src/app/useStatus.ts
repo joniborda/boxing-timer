@@ -29,6 +29,9 @@ export const useStatus = ({ minutes, seconds, warningMinutes, warningSeconds }: 
     };
 
     const stopWatch = () => {
+        if (status === State.running) {
+            playEndSound();
+        }
         setStatus(State.stopped);
         setSessionTime(SessionTime.idle);
     };
@@ -64,15 +67,12 @@ export const useStatus = ({ minutes, seconds, warningMinutes, warningSeconds }: 
 
     useEffect(() => {
         if (status === State.running) {
-            if (minutes === 0 && seconds === 0 && sessionTime === SessionTime.workTime) {
-                setStatus(State.stopped);
-                setSessionTime(SessionTime.idle);
-            }
 
             if (sessionTime === SessionTime.workTime && minutes <= warningMinutes && seconds <= warningSeconds) {
                 setSessionTime(SessionTime.warningTime);
                 playLastTenSecondsSound();
             }
+
         }
 
     }, [minutes, seconds, status, sessionTime, warningMinutes, warningSeconds, playLastTenSecondsSound, playStartSound, playEndSound]);

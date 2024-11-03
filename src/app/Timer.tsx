@@ -38,6 +38,10 @@ function Timer() {
         warningSeconds,
         breakMinutes,
         breakSeconds,
+        elapsedMinutes,
+        elapsedSeconds,
+        remainingMinutes,
+        remainingSeconds,
     } = useTimer();
 
 
@@ -65,7 +69,7 @@ function Timer() {
                         </div>
                     </div>
                     <div
-                        className={`overflow-hidden text-center font-bold text-[10vw] md:text-[20rem] p-4 rounded-3xl ${SessionTime.breakTime === sessionTime ?
+                        className={`text-center p-4 rounded-3xl ${SessionTime.breakTime === sessionTime || SessionTime.idle === sessionTime ?
                             "bg-[#ea1e0d]" :
                             SessionTime.prepareTime === sessionTime ?
                                 "bg-[#e2dc07]" :
@@ -76,43 +80,65 @@ function Timer() {
                             lineHeight: "1",
                             letterSpacing: "-.04em",
                         }}>
-                        {minutes < 10 ? "0" + minutes : minutes}:{seconds < 10 ? "0" + seconds : seconds}
-                    </div>
-                </div>
-                <div className="flex flex-row gap-4">
-                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                        <div className="text-[#e2dc07] text-4xl font-bold">
-                            {prepareMinutes < 10 ? "0" + prepareMinutes : prepareMinutes}:{prepareSeconds < 10 ? "0" + prepareSeconds : prepareSeconds}
-                        </div>
-                        <div className="text-sm text-[#868688]">
-                            PREPARE
-                        </div>
-                    </div>
-                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                        <div className="text-[#106e0c] text-4xl font-bold">
-                            {minutesPerRound < 10 ? "0" + minutesPerRound : minutesPerRound}:{secondsPerRound < 10 ? "0" + secondsPerRound : secondsPerRound}
-                        </div>
-                        <div className="text-sm text-[#868688]">
-                            ROUND
-                        </div>
-                    </div>
-                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                        <div className="text-[#ff6707] text-4xl font-bold">
-                            {warningMinutes < 10 ? "0" + warningMinutes : warningMinutes}:{warningSeconds < 10 ? "0" + warningSeconds : warningSeconds}
-                        </div>
-                        <div className="text-sm text-[#868688]">
-                            WARNING
-                        </div>
-                    </div>
-                    <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
-                        <div className="text-[#ea1e0d] text-4xl font-bold">
-                            {breakMinutes < 10 ? "0" + breakMinutes : breakMinutes}:{breakSeconds < 10 ? "0" + breakSeconds : breakSeconds}
-                        </div>
-                        <div className="text-sm text-[#868688]">
-                            REST
+                        {SessionTime.idle === sessionTime &&
+                            <span className="text-center text-white text-2xl font-bold">TOTAL TIME</span>
+                        }
+                        <div className="overflow-hidden text-center font-bold text-[10vw] md:text-[20rem]">
+                            {minutes < 10 ? "0" + minutes : minutes}:{seconds < 10 ? "0" + seconds : seconds}
                         </div>
                     </div>
                 </div>
+                {sessionTime === SessionTime.idle ?
+                    <div className="flex flex-row gap-4">
+                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                            <div className="text-[#e2dc07] text-4xl font-bold">
+                                {prepareMinutes < 10 ? "0" + prepareMinutes : prepareMinutes}:{prepareSeconds < 10 ? "0" + prepareSeconds : prepareSeconds}
+                            </div>
+                            <div className="text-sm text-[#868688]">
+                                PREPARE
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                            <div className="text-[#106e0c] text-4xl font-bold">
+                                {minutesPerRound < 10 ? "0" + minutesPerRound : minutesPerRound}:{secondsPerRound < 10 ? "0" + secondsPerRound : secondsPerRound}
+                            </div>
+                            <div className="text-sm text-[#868688]">
+                                ROUND
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                            <div className="text-[#ff6707] text-4xl font-bold">
+                                {warningMinutes < 10 ? "0" + warningMinutes : warningMinutes}:{warningSeconds < 10 ? "0" + warningSeconds : warningSeconds}
+                            </div>
+                            <div className="text-sm text-[#868688]">
+                                WARNING
+                            </div>
+                        </div>
+                        <div className="flex flex-col justify-center items-center rounded-3xl p-4 bg-[#202022]">
+                            <div className="text-[#ea1e0d] text-4xl font-bold">
+                                {breakMinutes < 10 ? "0" + breakMinutes : breakMinutes}:{breakSeconds < 10 ? "0" + breakSeconds : breakSeconds}
+                            </div>
+                            <div className="text-sm text-[#868688]">
+                                REST
+                            </div>
+                        </div>
+                    </div>
+                    :
+                    <div className="flex flex-row gap-4 w-full">
+                        <div className="bg-[#202022] rounded-xl p-4 w-full">
+                            <span className="block w-full text-center text-white text-2xl font-bold">
+                                {elapsedMinutes < 10 ? "0" + elapsedMinutes : elapsedMinutes}:{elapsedSeconds < 10 ? "0" + elapsedSeconds : elapsedSeconds}
+                            </span>
+                            <span className="block w-full text-center text-[#868688] text-xs font-bold">Elapsed</span>
+                        </div>
+                        <div className="bg-[#202022] rounded-xl p-4 w-full">
+                            <span className="block w-full text-center text-white text-2xl font-bold">
+                                {remainingMinutes < 10 ? "0" + remainingMinutes : remainingMinutes}:{remainingSeconds < 10 ? "0" + remainingSeconds : remainingSeconds}
+                            </span>
+                            <span className="block w-full text-center text-[#868688] text-xs font-bold">Remaining</span>
+                        </div>
+                    </div>
+                }
                 <div>
                     <div className="flex flex-row justify-center gap-4">
                         <button

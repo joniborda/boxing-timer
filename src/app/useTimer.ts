@@ -8,24 +8,54 @@ export const useTimer = () => {
 
 
     const refInterval = useRef<NodeJS.Timeout | undefined>();
-    const [rounds, setRounds] = useState(1);
     const [minutesPerRound, setMinutesPerRound] = useState(2);
     const [prepareMinutes, setPrepareMinutes] = useState(0);
     const [prepareSeconds, setPrepareSeconds] = useState(30);
     const [breakMinutes, setBreakMinutes] = useState(1);
     const [breakSeconds, setBreakSeconds] = useState(0);
     const [secondsPerRound, setSecondsPerRound] = useState(0);
-    const [minutes, setMinutes] = useState(prepareMinutes + (minutesPerRound * rounds) + (1 * rounds));
-    const [seconds, setSeconds] = useState(0);
     const [maxRounds, setMaxRounds] = useState(3);
+    const [rounds, setRounds] = useState(maxRounds);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
+    const [elapsedMinutes, setElapsedMinutes] = useState(0);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const [remainingMinutes, setRemainingMinutes] = useState(0);
+    const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+    const calculateTotalTime = useCallback(() => {
+        const totalSecondsPerRound = (minutesPerRound * 60) + secondsPerRound;
+        const totalSecondsBreakTime = (breakMinutes * 60) + breakSeconds;
+        const totalSecondsPrepareTime = (prepareMinutes * 60) + prepareSeconds;
+
+        const totalSeconds = totalSecondsPerRound * maxRounds + totalSecondsBreakTime * (maxRounds - 1) + totalSecondsPrepareTime;
+
+        const totalMinutes = Math.floor(totalSeconds / 60);
+        const remainingSeconds = totalSeconds % 60;
+
+        return {
+            totalMinutes,
+            totalSeconds: remainingSeconds
+        }
+    }, [
+        breakMinutes,
+        breakSeconds,
+        maxRounds,
+        minutesPerRound,
+        prepareMinutes,
+        prepareSeconds,
+        secondsPerRound,
+    ]);
+    const { totalMinutes, totalSeconds } = calculateTotalTime();
+
+    const [minutes, setMinutes] = useState(totalMinutes);
+    const [seconds, setSeconds] = useState(totalSeconds);
+
     const { status, isSoundActive, toggleSound, sessionTime, stopWatch, pauseOrStartWatch, setWorkTime, setBreakTime } = useStatus({
         minutes,
         seconds,
         warningMinutes,
         warningSeconds,
     });
-
     const pauseOrStartWatchInner = useCallback(() => {
         if (sessionTime === SessionTime.idle) {
             setMinutes(prepareMinutes);
@@ -36,14 +66,16 @@ export const useTimer = () => {
     }, [pauseOrStartWatch, prepareMinutes, prepareSeconds, sessionTime]);
 
     const stopWatchInner = useCallback(() => {
-        stopWatch();
+
         if (refInterval.current) {
             clearTimeout(refInterval.current);
         }
-        setSeconds(0);
-        setMinutes(minutesPerRound);
-        setRounds(1);
-    }, [minutesPerRound, refInterval, stopWatch]);
+        stopWatch();
+        const { totalMinutes, totalSeconds } = calculateTotalTime();
+        setSeconds(totalSeconds);
+        setMinutes(totalMinutes);
+        setRounds(maxRounds);
+    }, [calculateTotalTime, maxRounds, refInterval, stopWatch]);
 
 
     const manageTimer = useCallback((newMinutes: number, newSeconds: number) => {
@@ -62,7 +94,8 @@ export const useTimer = () => {
                 setRounds(rounds + 1);
             } else {
                 if (rounds === maxRounds) {
-                    stopWatch();
+                    stopWatchInner();
+                    return;
                 }
                 newMinutes = breakMinutes;
                 newSeconds = breakSeconds;
@@ -82,7 +115,7 @@ export const useTimer = () => {
         sessionTime,
         setBreakTime,
         setWorkTime,
-        stopWatch,
+        stopWatchInner,
     ]);
 
     const discount = useCallback(() => {
@@ -105,7 +138,7 @@ export const useTimer = () => {
 
     function closeSetup() {
         setIsSetupOpen(false);
-        stopWatch();
+        stopWatchInner();
     }
 
     useEffect(() => {
@@ -117,7 +150,7 @@ export const useTimer = () => {
         }
         refInterval.current = setTimeout(() => {
             discount();
-        }, 100);
+        }, 50);
         return () => {
             if (refInterval.current) {
                 clearTimeout(refInterval.current);
@@ -172,5 +205,9 @@ export const useTimer = () => {
         toggleSound,
         warningMinutes,
         warningSeconds,
+        elapsedMinutes,
+        elapsedSeconds,
+        remainingMinutes,
+        remainingSeconds,
     }
 };
