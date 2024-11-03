@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAudio } from "./useAudio";
+import { SessionTime, State, useStatus } from "./useStatus";
 
 const warningMinutes = 0;
 const warningSeconds = 10;
 
 export const useTimer = () => {
-    const { playEndSound, playStartSound, playLastTenSecondsSound, isSoundActive, toggleSound } = useAudio();
+
 
     const refInterval = useRef<NodeJS.Timeout | undefined>();
     const [rounds, setRounds] = useState(1);
@@ -18,58 +18,72 @@ export const useTimer = () => {
     const [minutes, setMinutes] = useState(prepareMinutes + (minutesPerRound * rounds) + (1 * rounds));
     const [seconds, setSeconds] = useState(0);
     const [maxRounds, setMaxRounds] = useState(3);
-    const [isRunning, setIsRunning] = useState(false);
-    const [isStopped, setIsStopped] = useState(true);
-    const [isBreakTime, setIsBreakTime] = useState(false);
-    const [isPrepareTime, setIsPrepareTime] = useState(false);
-    const [isLastTenSeconds, setIsLastTenSeconds] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
+    const { status, isSoundActive, toggleSound, sessionTime, stopWatch, pauseOrStartWatch, setWorkTime, setBreakTime } = useStatus({
+        minutes,
+        seconds,
+        warningMinutes,
+        warningSeconds,
+    });
 
-    const startWatch = useCallback(() => {
-        setIsRunning(true);
-        setIsPrepareTime(true);
-        setIsBreakTime(false);
-        setIsStopped(false);
-        setMinutes(prepareMinutes);
-        setSeconds(prepareSeconds);
+    const pauseOrStartWatchInner = useCallback(() => {
+        if (sessionTime === SessionTime.idle) {
+            setMinutes(prepareMinutes);
+            setSeconds(prepareSeconds);
+        }
+        pauseOrStartWatch();
 
-    }, [setIsRunning, playStartSound]);
+    }, [pauseOrStartWatch, prepareMinutes, prepareSeconds, sessionTime]);
 
-    const resumeWatch = useCallback(() => {
-        setIsRunning(true);
-    }, [setIsRunning]);
-
-    const stopWatch = useCallback(() => {
-        setIsRunning(false);
-        setIsLastTenSeconds(false);
+    const stopWatchInner = useCallback(() => {
+        stopWatch();
         if (refInterval.current) {
             clearTimeout(refInterval.current);
         }
         setSeconds(0);
         setMinutes(minutesPerRound);
         setRounds(1);
-        setIsStopped(true);
-    }, [minutesPerRound, refInterval]);
+    }, [minutesPerRound, refInterval, stopWatch]);
 
-    const pauseWatch = useCallback(() => {
-        setIsRunning(false);
-        if (refInterval.current) {
-            clearTimeout(refInterval.current);
-        }
-    }, [refInterval, setIsRunning]);
 
-    const pauseOrStarWatch = useCallback(() => {
-        if (isRunning) {
-            pauseWatch();
-            return;
-        }
-        if (isStopped) {
-            startWatch();
-            return;
+    const manageTimer = useCallback((newMinutes: number, newSeconds: number) => {
+        if (newMinutes < 0) {
+            newSeconds = 0;
+            if (sessionTime == SessionTime.prepareTime) {
+                setWorkTime();
+                setRounds(1);
+                setMinutes(minutesPerRound);
+                setSeconds(secondsPerRound);
+                return;
+            } else if (sessionTime == SessionTime.breakTime) {
+                setWorkTime();
+                newMinutes = minutesPerRound;
+                newSeconds = secondsPerRound;
+                setRounds(rounds + 1);
+            } else {
+                if (rounds === maxRounds) {
+                    stopWatch();
+                }
+                newMinutes = breakMinutes;
+                newSeconds = breakSeconds;
+                setBreakTime();
+            }
         }
 
-        resumeWatch();
-    }, [isRunning, startWatch, pauseWatch]);
+        setMinutes(newMinutes);
+        setSeconds(newSeconds);
+    }, [
+        breakMinutes,
+        breakSeconds,
+        maxRounds,
+        minutesPerRound,
+        rounds,
+        secondsPerRound,
+        sessionTime,
+        setBreakTime,
+        setWorkTime,
+        stopWatch,
+    ]);
 
     const discount = useCallback(() => {
         let newSeconds = seconds - 1;
@@ -78,43 +92,12 @@ export const useTimer = () => {
             newMinutes -= 1;
             newSeconds = 59;
         }
-        
-        if (newMinutes === 0 && newSeconds <= 10 && !isBreakTime && !isLastTenSeconds && !isPrepareTime) {
-            setIsLastTenSeconds(true);
-            playLastTenSecondsSound();
-        }
-        if (newMinutes < 0) {
-            newSeconds = 0;
-            setIsLastTenSeconds(false);
-            if (isPrepareTime) {
-                setIsPrepareTime(false);
-                setRounds(1);
-                setMinutes(minutesPerRound);
-                setSeconds(secondsPerRound);
-                playStartSound();
-                return;
-            }
-            if (isBreakTime) {
-                newMinutes = minutesPerRound;
-                newSeconds = secondsPerRound;
-                setIsBreakTime(false);
-                setRounds(rounds + 1);
-                playStartSound();
-            } else {
-                if (rounds === maxRounds) {
-                    stopWatch();
-                }
-                newMinutes = breakMinutes;
-                newSeconds = breakSeconds;
-                setIsBreakTime(true);
-                playEndSound();
-            }
-
-        }
-
-        setMinutes(newMinutes);
-        setSeconds(newSeconds);
-    }, [seconds, minutes, isBreakTime, rounds, maxRounds, minutesPerRound, playStartSound, playEndSound, playLastTenSecondsSound, stopWatch, isLastTenSeconds]);
+        manageTimer(newMinutes, newSeconds);
+    }, [
+        manageTimer,
+        minutes,
+        seconds,
+    ]);
 
     function openSetup() {
         setIsSetupOpen(true);
@@ -126,21 +109,21 @@ export const useTimer = () => {
     }
 
     useEffect(() => {
-        if (!isRunning) {
-            return;
-        }
         if (refInterval.current) {
             clearTimeout(refInterval.current);
         }
+        if (status !== State.running) {
+            return;
+        }
         refInterval.current = setTimeout(() => {
             discount();
-        }, 1000);
+        }, 100);
         return () => {
             if (refInterval.current) {
                 clearTimeout(refInterval.current);
             }
         }
-    }, [isRunning, seconds, minutes, discount]);
+    }, [seconds, minutes, discount, status]);
 
     useEffect(() => {
         // handle to close setup on pressing escape
@@ -161,34 +144,32 @@ export const useTimer = () => {
     }, [closeSetup]);
 
     return {
-        seconds,
-        minutes,
-        rounds,
-        isRunning,
-        isBreakTime,
-        isLastTenSeconds,
-        isSetupOpen,
-        stopWatch,
-        pauseOrStarWatch,
-        openSetup,
+        status,
+        sessionTime,
+        breakMinutes,
+        breakSeconds,
         closeSetup,
+        isSetupOpen,
+        isSoundActive,
         maxRounds,
-        prepareMinutes,
+        minutes,
         minutesPerRound,
-        setMinutesPerRound,
-        setPrepareMinutes,
-        setPrepareSeconds,
+        openSetup,
+        prepareMinutes,
+        prepareSeconds,
+        rounds,
+        seconds,
+        secondsPerRound,
         setBreakMinutes,
         setBreakSeconds,
         setMaxRounds,
-        isSoundActive,
-        toggleSound,
-        isPrepareTime,
-        prepareSeconds,
-        secondsPerRound,
+        setMinutesPerRound,
+        setPrepareMinutes,
+        setPrepareSeconds,
         setSecondsPerRound,
-        breakMinutes,
-        breakSeconds,
+        stopWatch: stopWatchInner,
+        pauseOrStarWatch: pauseOrStartWatchInner,
+        toggleSound,
         warningMinutes,
         warningSeconds,
     }

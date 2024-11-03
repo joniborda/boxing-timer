@@ -1,5 +1,6 @@
 'use client'
 import { useCLock } from "./useClock";
+import { SessionTime, State } from "./useStatus";
 import { useTimer } from "./useTimer";
 
 function Timer() {
@@ -14,9 +15,6 @@ function Timer() {
         seconds,
         minutes,
         rounds,
-        isRunning,
-        isBreakTime,
-        isLastTenSeconds,
         openSetup,
         closeSetup,
         isSetupOpen,
@@ -30,7 +28,8 @@ function Timer() {
         setMinutesPerRound,
         isSoundActive,
         toggleSound,
-        isPrepareTime,
+        status,
+        sessionTime,
         prepareMinutes,
         prepareSeconds,
         secondsPerRound,
@@ -66,7 +65,13 @@ function Timer() {
                         </div>
                     </div>
                     <div
-                        className={`overflow-hidden text-center font-bold text-[10vw] md:text-[20rem] p-4 rounded-3xl ${isBreakTime ? "bg-[#ea1e0d]" : isPrepareTime ? "bg-[#e2dc07]" : isLastTenSeconds ? "bg-[#ff6707]" : "bg-[#106e0c]"}`}
+                        className={`overflow-hidden text-center font-bold text-[10vw] md:text-[20rem] p-4 rounded-3xl ${SessionTime.breakTime === sessionTime ?
+                            "bg-[#ea1e0d]" :
+                            SessionTime.prepareTime === sessionTime ?
+                                "bg-[#e2dc07]" :
+                                SessionTime.warningTime === sessionTime ?
+                                    "bg-[#ff6707]" : "bg-[#106e0c]"
+                            }`}
                         style={{
                             lineHeight: "1",
                             letterSpacing: "-.04em",
@@ -115,7 +120,7 @@ function Timer() {
                             onClick={() => {
                                 pauseOrStarWatch();
                             }}>
-                            {isRunning ? "Pause" : "Start"}
+                            {status === State.running ? "Pause" : "Start"}
                         </button>
                         <button
                             className="py-2 sm:py-4 px-4 sm:px-6 bg-white text-black text-base md:text-2xl rounded-lg"
