@@ -209,5 +209,9 @@ export const useTimer = () => {
         elapsedSeconds,
         remainingMinutes,
         remainingSeconds,
+        setElapsedMinutes,
+        setElapsedSeconds,
+        setRemainingMinutes,
+        setRemainingSeconds,
     }
 };
